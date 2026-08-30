@@ -1,0 +1,145 @@
+rules_version = '2';
+
+// Fire & Stone — Firestore Security Rules
+//
+// STATUS: Bootstrap baseline, implementing the frozen access matrix from
+// docs/implementation/v4-implementation-research/04-security-rules-authorization.md
+// and docs/architecture/Architecture-V1.md §12.
+//
+// RISK: Per docs/architecture/Repository-GitHub-Setup-V1.md §10, this file
+// is explicitly listed as a High/Architectural risk artifact. Any change
+// requires Grok challenge and human approval before merge. It has NOT been
+// deployed to any project and has not been exercised against the emulator
+// in this bootstrap task beyond static syntax validation — see the
+// bootstrap report for what was and was not validated.
+//
+// Principles enforced:
+//   - Deny by default.
+//   - Roles come from custom claims (request.auth.token.role), not document
+//     reads, per packet 04/05.
+//   - Clients can NEVER create or mutate `orders` directly — order writes
+//     are Cloud-Functions-only (Admin SDK bypasses rules).
+//   - Clients can NEVER write `deliverySlots.reservedCount` or any
+//     monetary/status field.
+//   - Customers only ever read/write their own user-scoped data.
+
+function isSignedIn() {
+  return request.auth != null;
+}
+
+function isOwner(userId) {
+  return isSignedIn() && request.auth.uid == userId;
+}
+
+function hasRole(role) {
+  return isSignedIn() &&
+    request.auth.token.role != null &&
+    request.auth.token.role == role;
+}
+
+function isStaff() {
+  return hasRole('ADMIN') || hasRole('KITCHEN');
+}
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---------------------------------------------------------------------
+    // users/{userId}
+    // ---------------------------------------------------------------------
+    match /users/{userId} {
+      allow read: if isOwner(userId) || hasRole('ADMIN');
+      // Customers may update their own non-privileged profile fields.
+      // Role assignment happens only via Admin SDK (custom claims), never
+      // through a Firestore document write.
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId) || hasRole('ADMIN');
+      allow delete: if false;
+    }
+
+    // ---------------------------------------------------------------------
+    // Catalog: categories / products / extras — public read, staff-limited
+    // write. Admin has full catalog control; Kitchen may only toggle
+    // availability (enforced by task-level Cloud Function/Admin UI, not by
+    // this rule alone — Firestore rules cannot easily diff field-level
+    // write scope without duplicating the whole document; that logic is
+    // documented here as a known bootstrap limitation, see report).
+    // ---------------------------------------------------------------------
+    match /categories/{categoryId} {
+      allow read: if true;
+      allow write: if hasRole('ADMIN');
+    }
+
+    match /products/{productId} {
+      allow read: if true;
+      allow write: if hasRole('ADMIN');
+    }
+
+    match /extras/{extraId} {
+      allow read: if true;
+      allow write: if hasRole('ADMIN');
+    }
+
+    // ---------------------------------------------------------------------
+    // orders/{orderId}
+    // Server-authoritative. Clients never create orders directly — only
+    // the createOrder Cloud Function (using the Admin SDK, which bypasses
+    // these rules) may create an order document.
+    // ---------------------------------------------------------------------
+    match /orders/{orderId} {
+      allow read: if isSignedIn() &&
+        (resource.data.userId == request.auth.uid || isStaff());
+      allow create: if false; // Functions-only (Admin SDK bypasses rules).
+      allow update: if false; // Status/payment transitions are Functions-only.
+      allow delete: if false;
+    }
+
+    // ---------------------------------------------------------------------
+    // deliverySlots/{slotId}
+    // Public read (for slot picker). reservedCount and capacity are never
+    // client-writable — slot reservation is an atomic server transaction.
+    // ---------------------------------------------------------------------
+    match /deliverySlots/{slotId} {
+      allow read: if true;
+      allow write: if false; // Admin SDK / Functions only.
+    }
+
+    // ---------------------------------------------------------------------
+    // addresses/{addressId}
+    // Root collection, owner-scoped per packet 03/04.
+    // ---------------------------------------------------------------------
+    match /addresses/{addressId} {
+      allow read: if isSignedIn() &&
+        (resource.data.userId == request.auth.uid || isStaff());
+      allow create: if isSignedIn() &&
+        request.resource.data.userId == request.auth.uid;
+      allow update, delete: if isSignedIn() &&
+        resource.data.userId == request.auth.uid;
+    }
+
+    // ---------------------------------------------------------------------
+    // notifications/{notificationId}
+    // Server-written (Functions/Admin SDK). Owner read-only.
+    // ---------------------------------------------------------------------
+    match /notifications/{notificationId} {
+      allow read: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow write: if false; // Functions/Admin SDK only.
+    }
+
+    // ---------------------------------------------------------------------
+    // settings/{docId}
+    // Public read (e.g. delivery fee display), Admin-only write.
+    // ---------------------------------------------------------------------
+    match /settings/{docId} {
+      allow read: if true;
+      allow write: if hasRole('ADMIN');
+    }
+
+    // ---------------------------------------------------------------------
+    // Deny everything else by default.
+    // ---------------------------------------------------------------------
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

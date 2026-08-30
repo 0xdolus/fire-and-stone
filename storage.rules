@@ -1,0 +1,44 @@
+rules_version = '2';
+
+// Fire & Stone — Cloud Storage Security Rules
+//
+// STATUS: Bootstrap baseline, implementing
+// docs/implementation/v4-implementation-research/04-security-rules-authorization.md
+// ("Storage" section): product images are public-read, Admin-write, with
+// content-type and size validation.
+//
+// RISK: See docs/architecture/Repository-GitHub-Setup-V1.md §10 — Storage
+// rules are listed as a High/Architectural risk artifact. Not deployed to
+// any project; only statically validated in this bootstrap task.
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function hasRole(role) {
+      return isSignedIn() &&
+        request.auth.token.role != null &&
+        request.auth.token.role == role;
+    }
+
+    function isValidImage() {
+      return request.resource.contentType.matches('image/.*') &&
+        request.resource.size < 5 * 1024 * 1024; // 5 MB ceiling
+    }
+
+    // Product images: public read, Admin-only write, validated content type
+    // and size.
+    match /products/{allPaths=**} {
+      allow read: if true;
+      allow write: if hasRole('ADMIN') && isValidImage();
+    }
+
+    // Deny everything else by default.
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

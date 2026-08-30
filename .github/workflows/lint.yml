@@ -1,0 +1,35 @@
+name: lint
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+# Least-privilege default; no write access needed for lint.
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: Lint (ESLint / formatting)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci || npm install
+
+      # Bootstrap stage: no product code and no ESLint config exist yet in
+      # any workspace, so the root "lint" script is a no-op placeholder
+      # (see package.json). This job intentionally still runs so that the
+      # required-status-check plumbing exists before any code lands.
+      - name: Run lint across workspaces
+        run: npm run lint --workspaces --if-present

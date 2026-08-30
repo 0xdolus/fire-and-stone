@@ -1,0 +1,22 @@
+{
+  "name": "fire-and-stone",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Fire & Stone — monorepo root. Bootstrap stage: no product features implemented yet.",
+  "workspaces": [
+    "apps/*",
+    "packages/*",
+    "functions"
+  ],
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "lint": "echo \"No workspace has lint configured yet (bootstrap stage).\"",
+    "typecheck": "echo \"No workspace has typecheck configured yet (bootstrap stage).\"",
+    "test": "echo \"No workspace has tests configured yet (bootstrap stage).\"",
+    "validate:repo-structure": "node scripts/validate-repo-structure.js"
+  },
+  "devDependencies": {},
+  "license": "UNLICENSED"
+}

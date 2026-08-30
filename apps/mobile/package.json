@@ -1,0 +1,11 @@
+{
+  "name": "@fire-and-stone/mobile",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Fire & Stone customer mobile app (Expo + React Native + TypeScript). Bootstrap placeholder — no product code yet.",
+  "scripts": {
+    "lint": "echo \"apps/mobile: no lint configured yet (bootstrap stage)\"",
+    "typecheck": "echo \"apps/mobile: no typecheck configured yet (bootstrap stage)\"",
+    "test": "echo \"apps/mobile: no tests configured yet (bootstrap stage)\""
+  }
+}

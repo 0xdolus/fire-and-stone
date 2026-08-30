@@ -1,0 +1,36 @@
+# Fire & Stone — CODEOWNERS
+#
+# NOTE (bootstrap task): the GitHub handles below are PLACEHOLDERS. This
+# repository has not been pushed to GitHub yet and no real usernames/teams
+# were provided to this bootstrap task, so none were invented. Replace
+# every @fire-and-stone/... placeholder with a real GitHub user or team
+# before enabling "Require review from Code Owners" branch protection.
+# See the bootstrap report, "Items requiring human approval."
+#
+# Per docs/architecture/Repository-GitHub-Setup-V1.md §4/§6: CODEOWNERS plus
+# the PR review checklist are what enforce that a diff does not touch
+# forbidden paths without the right human in the loop.
+
+# Default owner for anything not matched below.
+*                                       @fire-and-stone/maintainers
+
+# Frozen source-of-truth documents — architecture-level change control.
+/docs/architecture/                    @fire-and-stone/architecture-owners
+/docs/implementation/Implementation-V4.md @fire-and-stone/architecture-owners
+/docs/workflow/                        @fire-and-stone/architecture-owners
+/docs/decisions/DECISION-LOG.md        @fire-and-stone/architecture-owners
+
+# High/Architectural risk: security rules.
+/firestore.rules                       @fire-and-stone/security-owners
+/firestore.indexes.json                @fire-and-stone/security-owners
+/storage.rules                         @fire-and-stone/security-owners
+
+# High/Architectural risk: server-authoritative business logic.
+/functions/                            @fire-and-stone/security-owners
+
+# Repository process / CI controls.
+/.github/                              @fire-and-stone/architecture-owners
+/CLAUDE.md                             @fire-and-stone/architecture-owners
+
+# Environment/config surface (names only — see environment/README.md).
+/environment/                          @fire-and-stone/architecture-owners

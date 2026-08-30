@@ -1,0 +1,55 @@
+name: rules-test
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  rules-test:
+    name: Firestore/Storage rules tests (emulator)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci || npm install
+
+      - name: Check for rules test suite
+        id: check
+        run: |
+          if [ -f "firebase.json" ] && [ -d "functions" ] && grep -q "\"test:rules\"" package.json 2>/dev/null; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      # Bootstrap stage: no rules-test script exists yet (no
+      # @firebase/rules-unit-testing suite has been written), so this step
+      # is skipped rather than failing the required check. Per
+      # docs/architecture/Repository-GitHub-Setup-V1.md §7: "Run in CI when
+      # emulator scripts exist; do not require network production
+      # credentials." Firebase project ids used here MUST always be
+      # `demo-*` — never a real project.
+      - name: Install Firebase CLI
+        if: steps.check.outputs.present == 'true'
+        run: npm install -g firebase-tools
+
+      - name: Run rules tests via emulator
+        if: steps.check.outputs.present == 'true'
+        run: firebase emulators:exec --only firestore,storage,auth "npm run test:rules" --project demo-fireandstone
+
+      - name: No rules test suite yet
+        if: steps.check.outputs.present == 'false'
+        run: echo "No rules test suite found (no test:rules script). Skipping — this is expected at bootstrap stage. Add @firebase/rules-unit-testing coverage before firestore.rules/storage.rules changes are merged (High/Architectural risk path)."

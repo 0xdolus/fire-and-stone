@@ -1,0 +1,9 @@
+# NOTE (bootstrap task): replace OWNER/REPO below with the real GitHub
+# owner/repo once this bootstrap is pushed. This repository does not exist
+# on GitHub yet as of bootstrap time, so the real URL is unknown — see the
+# bootstrap report, "Items requiring human approval."
+blank_issues_enabled: false
+contact_links:
+  - name: Fire & Stone workflow reference
+    url: https://github.com/OWNER/REPO/blob/main/docs/workflow/AI-Development-Workflow-v1.md
+    about: Read the AI Development Workflow V1 before filing a task packet.

@@ -1,0 +1,92 @@
+# ---------------------------------------------------------------------------
+# Secrets — never commit. See environment/README.md and
+# docs/architecture/Repository-GitHub-Setup-V1.md (environment/config rules).
+# ---------------------------------------------------------------------------
+.env
+.env.local
+.env.*.local
+.env.development
+.env.staging
+.env.production
+*.env
+!environment/.env.example
+
+# Firebase service accounts / Admin SDK keys
+*service-account*.json
+*firebase-adminsdk*.json
+serviceAccountKey.json
+
+# Any credential-shaped file that should never land in git
+*.pem
+*.key
+*.p12
+*.jks
+*.keystore
+*.mobileprovision
+credentials.json
+
+# ---------------------------------------------------------------------------
+# Dependencies
+# ---------------------------------------------------------------------------
+node_modules/
+.pnp
+.pnp.js
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+
+# ---------------------------------------------------------------------------
+# Build outputs
+# ---------------------------------------------------------------------------
+dist/
+build/
+lib/
+.next/
+out/
+.expo/
+.expo-shared/
+web-build/
+*.tsbuildinfo
+
+# ---------------------------------------------------------------------------
+# Firebase local state / emulator data
+# ---------------------------------------------------------------------------
+.firebase/
+firebase-debug.log
+firebase-debug.*.log
+firestore-debug.log
+ui-debug.log
+pubsub-debug.log
+database-debug.log
+environment/seed-data/
+!environment/seed-data/.gitkeep
+
+# ---------------------------------------------------------------------------
+# EAS / Expo
+# ---------------------------------------------------------------------------
+*.orig.*
+.metro-health-check*
+
+# ---------------------------------------------------------------------------
+# OS / editor
+# ---------------------------------------------------------------------------
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json
+.idea/
+
+# ---------------------------------------------------------------------------
+# Logs
+# ---------------------------------------------------------------------------
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+
+# ---------------------------------------------------------------------------
+# Coverage / test artifacts
+# ---------------------------------------------------------------------------
+coverage/
+.nyc_output/

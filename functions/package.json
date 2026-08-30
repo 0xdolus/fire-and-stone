@@ -1,0 +1,16 @@
+{
+  "name": "@fire-and-stone/functions",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Fire & Stone Firebase Cloud Functions (server-authoritative business logic). Bootstrap placeholder — no product code yet.",
+  "main": "lib/index.js",
+  "engines": {
+    "node": "20"
+  },
+  "scripts": {
+    "build": "echo \"functions: no build configured yet (bootstrap stage)\"",
+    "lint": "echo \"functions: no lint configured yet (bootstrap stage)\"",
+    "typecheck": "echo \"functions: no typecheck configured yet (bootstrap stage)\"",
+    "test": "echo \"functions: no tests configured yet (bootstrap stage)\""
+  }
+}

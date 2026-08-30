@@ -1,0 +1,11 @@
+{
+  "name": "@fire-and-stone/admin",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Fire & Stone Kitchen/Admin web app (React/Next.js + TypeScript). Bootstrap placeholder — no product code yet.",
+  "scripts": {
+    "lint": "echo \"apps/admin: no lint configured yet (bootstrap stage)\"",
+    "typecheck": "echo \"apps/admin: no typecheck configured yet (bootstrap stage)\"",
+    "test": "echo \"apps/admin: no tests configured yet (bootstrap stage)\""
+  }
+}
