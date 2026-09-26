@@ -1,16 +1,21 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
+    "jsx": "react-native",
+    "lib": ["ES2020"],
+    "moduleResolution": "Bundler",
+    "noEmit": true,
     "strict": true,
+    "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"],
-      "*": ["./*"]
+      "@/*": ["src/*"]
     }
   },
   "include": [
     "**/*.ts",
     "**/*.tsx",
     ".expo/types/**/*.ts",
-    "expo-env.d.ts"
+    "expo-env.d.ts",
+    "src"
   ]
 }
